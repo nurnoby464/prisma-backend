@@ -18,6 +18,12 @@ enum Role {
   SUPER_ADMIN
 }
 
+enum Platform {
+  WEB
+  MOBILE
+  DESKTOP
+}
+
 model User {
   userId    String   @id @default(uuid())
   name      String
@@ -32,4 +38,40 @@ model User {
 
   @@index([isActive])
   @@map("users")
+}
+
+model ProjectCategory {
+  projectCategoryId String   @id @default(uuid(7)) @db.Uuid
+  name              String   @unique
+  slug              String   @unique
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  projects Project[]
+
+  @@map("project_categories")
+}
+
+model Project {
+  projectId     String     @id @default(uuid(7)) @db.Uuid
+  title         String
+  slug          String     @unique
+  description   String
+  image         String
+  liveUrl       String?
+  platforms     Platform[]
+  technologies  String[]
+  isHighlighted Boolean    @default(false)
+  isActive      Boolean    @default(true)
+  sortOrder     Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  projectCategoryId String          @db.Uuid
+  category          ProjectCategory @relation(fields: [projectCategoryId], references: [projectCategoryId], onDelete: Restrict)
+
+  @@index([isActive, sortOrder])
+  @@index([projectCategoryId])
+  @@map("projects")
 }
