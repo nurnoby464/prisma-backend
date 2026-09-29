@@ -19,8 +19,7 @@ export const createProjectSchema = z.object({
     .regex(
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
       "Use lowercase letters, numbers and hyphens",
-    )
-    .optional(),
+    ),
   description: z.string().trim().min(10).max(2000),
   image: httpUrl,
   liveUrl: httpUrl.optional(),
@@ -48,4 +47,16 @@ export const createProjectSchema = z.object({
   projectCategoryId: z.uuid().optional(),
 });
 
+export const projectListQuerySchema = z.object({
+  search: z.string().trim().toLowerCase().max(50).optional(),
+
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+  page: z.coerce.number().int().min(1).default(1),
+
+  sortBy: z.enum(["createdAt", "title", "sortOrder"]).default("sortOrder"),
+  sortWith: z.enum(["asc", "desc"]).default("asc"),
+  projectCategoryId: z.uuid().optional(),
+});
+
+export type GetProjectListQuery = z.infer<typeof projectListQuerySchema>;
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;

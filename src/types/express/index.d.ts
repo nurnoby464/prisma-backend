@@ -1,5 +1,5 @@
 import "express";
-import type { ITokenPayload } from "../../utils/jwthelper.ts";
+import type { ITokenPayload } from "../../utils/jwtHelper.ts";
 
 declare global {
   namespace Express {
