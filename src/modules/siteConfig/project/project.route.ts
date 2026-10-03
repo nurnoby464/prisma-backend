@@ -18,6 +18,6 @@ projectRouter.get(
   ProjectController.getProjectList,
 );
 projectRouter.get(
-  "/project-categories",
+  "/categories",
   ProjectController.getProjectCategoryList,
 );
