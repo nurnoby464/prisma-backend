@@ -73,13 +73,27 @@ export const getProjectCategoryList = async () => {
 
 export const deleteProject = async (projectId: string) => {
   if (!projectId) throw new ApiError(400, "Project id not found");
-  const result = await prisma.project.delete({
-    where: {
-      projectId,
-    },
+  // const result = await prisma.project.delete({
+  //   where: {
+  //     projectId,
+  //   },
+  // });
+  return await prisma.$transaction(async (tx) => {
+    const deletedProject = await tx.project.delete({
+      where: { projectId },
+    });
+
+    const projectCountByCategory = await tx.project.count({
+      where: { projectCategoryId: deletedProject.projectCategoryId },
+    });
+    console.log(projectCountByCategory)
+    if (projectCountByCategory === 0) {
+      await tx.projectCategory.delete({
+        where: { projectCategoryId: deletedProject.projectCategoryId },
+      });
+    }
+    return deletedProject;
   });
-  console.log(result);
-  return null;
 };
 
 export const updateProject = async (
