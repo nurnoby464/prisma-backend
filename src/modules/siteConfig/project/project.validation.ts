@@ -58,5 +58,14 @@ export const projectListQuerySchema = z.object({
   projectCategoryId: z.uuid().optional(),
 });
 
+export const paramsSchema = z.object({
+  id: z.uuid(),
+});
+
+export const updateProjectSchema = createProjectSchema.omit({
+  projectCategoryId: true,
+});
+
 export type GetProjectListQuery = z.infer<typeof projectListQuerySchema>;
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
+export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;

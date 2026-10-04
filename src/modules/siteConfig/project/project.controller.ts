@@ -19,7 +19,7 @@ export const getProjectList = asyncHandler(async (req, res) => {
   );
   ApiResponse.paginated({
     res,
-    message: "Project created successfully",
+    message: "Project get successfully",
     data: projects,
     total,
     page,
@@ -27,11 +27,28 @@ export const getProjectList = asyncHandler(async (req, res) => {
   });
 });
 
-export const getProjectCategoryList = asyncHandler(async (req, res) => {
+export const getProjectCategoryList = asyncHandler(async (_req, res) => {
   const result = await ProjectService.getProjectCategoryList();
   ApiResponse.success({
     res,
     message: "Project categories fetch successfully",
+    data: result,
+  });
+});
+export const deleteProject = asyncHandler(async (req, res) => {
+  const result = await ProjectService.deleteProject(req.params.id as string);
+  ApiResponse.success({
+    res,
+    message: "Project delete successfully",
+    data: result,
+  });
+});
+
+export const updateProject = asyncHandler(async (req, res) => {
+  const result = await ProjectService.updateProject(req.params.id as string,req.body);
+  ApiResponse.success({
+    res,
+    message: "Project updated successfully",
     data: result,
   });
 });

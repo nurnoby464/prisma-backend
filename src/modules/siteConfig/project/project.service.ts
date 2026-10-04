@@ -2,6 +2,7 @@ import { prisma } from "../../../lib/prisma.js";
 import type {
   CreateProjectInput,
   GetProjectListQuery,
+  UpdateProjectInput,
 } from "./project.validation.js";
 import type { Prisma } from "../../../generated/prisma/client.js";
 import { useSkip } from "../../../utils/helper.js";
@@ -68,4 +69,44 @@ export const getProjectCategoryList = async () => {
   if (!projectCategory || projectCategory.length < 1)
     throw new ApiError(404, "Category not found");
   return projectCategory;
+};
+
+export const deleteProject = async (projectId: string) => {
+  if (!projectId) throw new ApiError(400, "Project id not found");
+  const result = await prisma.project.delete({
+    where: {
+      projectId,
+    },
+  });
+  console.log(result);
+  return null;
+};
+
+export const updateProject = async (
+  projectId: string,
+  payload: UpdateProjectInput,
+) => {
+  if (!projectId) throw new ApiError(400, "Project id not found");
+  const { category, categorySlug, liveUrl, ...projectData } = payload;
+  if (!categorySlug || !category)
+    throw new ApiError(400, "Category slug required");
+  return await prisma.$transaction(async (tx) => {
+    // Upsert the project category if category and categorySlug are provided
+    const categoryResult = await tx.projectCategory.upsert({
+      where: { slug: categorySlug },
+      update: {},
+      create: { name: category, slug: categorySlug },
+      select: { projectCategoryId: true },
+    });
+
+    if (!categoryResult) throw new ApiError(404, "Project category not found");
+    return await prisma.project.update({
+      where: { projectId },
+      data: {
+        ...projectData,
+        ...(liveUrl !== undefined && { liveUrl }),
+        projectCategoryId: categoryResult.projectCategoryId,
+      },
+    });
+  });
 };

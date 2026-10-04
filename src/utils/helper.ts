@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import type { Request } from "express";
-import type { number } from "zod";
 
 export const useHashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, 10);
