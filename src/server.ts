@@ -1,8 +1,14 @@
+// src/server.ts
 import { app } from "./app.js";
 import { env } from "./config/env.js";
 import { prisma } from "./lib/prisma.js";
 
-async function start() {
+// Vercel sets VERCEL=1. Serverless platforms run the app for us,
+// so we only start our own HTTP server everywhere else
+// (local dev, VPS, Docker, Railway).
+const isServerless = Boolean(process.env["VERCEL"]);
+
+async function startServer() {
   try {
     await prisma.$queryRaw`SELECT 1`;
     console.log("Database connected");
@@ -26,4 +32,9 @@ async function start() {
   process.on("SIGTERM", shutdown);
 }
 
-start();
+if (!isServerless) {
+  void startServer();
+}
+
+// Vercel imports this. Locally it is simply unused.
+export default app;
