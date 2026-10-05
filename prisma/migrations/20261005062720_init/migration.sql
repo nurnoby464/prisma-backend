@@ -1,5 +1,24 @@
 -- CreateEnum
+CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN', 'SUPER_ADMIN');
+
+-- CreateEnum
 CREATE TYPE "Platform" AS ENUM ('WEB', 'MOBILE', 'DESKTOP');
+
+-- CreateTable
+CREATE TABLE "users" (
+    "userId" UUID NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "phone" TEXT,
+    "avatar" TEXT,
+    "role" "Role" NOT NULL DEFAULT 'USER',
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("userId")
+);
 
 -- CreateTable
 CREATE TABLE "project_categories" (
@@ -34,6 +53,12 @@ CREATE TABLE "projects" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE INDEX "users_isActive_idx" ON "users"("isActive");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "project_categories_name_key" ON "project_categories"("name");
 
 -- CreateIndex
@@ -47,9 +72,6 @@ CREATE INDEX "projects_isActive_sortOrder_idx" ON "projects"("isActive", "sortOr
 
 -- CreateIndex
 CREATE INDEX "projects_projectCategoryId_idx" ON "projects"("projectCategoryId");
-
--- CreateIndex
-CREATE INDEX "users_isActive_idx" ON "users"("isActive");
 
 -- AddForeignKey
 ALTER TABLE "projects" ADD CONSTRAINT "projects_projectCategoryId_fkey" FOREIGN KEY ("projectCategoryId") REFERENCES "project_categories"("projectCategoryId") ON DELETE RESTRICT ON UPDATE CASCADE;
